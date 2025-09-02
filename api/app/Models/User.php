@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -20,6 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'role_id',
         'password',
     ];
 
@@ -42,4 +46,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /* 
+    *@param array $input
+    * @return  Builder | model | null
+    */
+    final public function getUserByEmailOrPhone($input): Builder|Model|null
+    {
+        $query = self::query();
+    
+        if (!empty($input['email'])) {
+            $query->where('email', $input['email']);
+        }
+    
+        if (!empty($input['phone'])) {
+            $query->orWhere('phone', $input['phone']);
+        }
+    
+        return $query->first();
+    }
+    
+    
 }
